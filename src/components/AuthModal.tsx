@@ -127,42 +127,42 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-fadeIn">
-      <div className="relative w-full max-w-md rounded-2xl border-2 border-amber-400/80 bg-gradient-to-b from-slate-900 to-indigo-950 p-6 text-white shadow-2xl max-h-[92vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-fadeIn font-sans-ui">
+      <div className="relative w-full max-w-md rounded-3xl border border-amber-400/30 bg-slate-900 p-6 sm:p-8 text-slate-100 shadow-2xl max-h-[92vh] overflow-y-auto">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-white transition"
+          className="absolute top-5 right-5 text-slate-400 hover:text-white transition-colors cursor-pointer"
           aria-label="Fechar"
         >
-          <X className="w-6 h-6" />
+          <X className="w-5 h-5" />
         </button>
 
-        <div className="text-center mb-5">
-          <div className="inline-flex p-3 rounded-full bg-amber-500/20 text-amber-400 mb-2 border border-amber-500/40">
-            <Sparkles className="w-7 h-7" />
+        <div className="text-center mb-6">
+          <div className="inline-flex p-3 rounded-2xl bg-amber-500/10 text-amber-400 mb-2 border border-amber-400/20">
+            <Sparkles className="w-6 h-6" />
           </div>
-          <h3 className="text-2xl font-black tracking-wide text-amber-300">
+          <h3 className="font-display text-xl sm:text-2xl font-bold tracking-wide text-amber-100">
             {mode === 'login' ? 'Entrar no Quiz' : 'Criar Conta de Discípulo'}
           </h3>
-          <p className="text-xs text-slate-300 mt-1">
-            Salve suas conquistas, histórico e pontuação no ranking mundial!
+          <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
+            Sincronize conquistas, histórico e pontuação no ranking global
           </p>
         </div>
 
         {errorMsg && (
-          <div className="mb-4 p-3 rounded-xl bg-rose-950/80 border border-rose-500/40 text-rose-300 text-xs flex items-center gap-2">
+          <div className="mb-4 p-3 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-300 text-xs flex items-center gap-2">
             <ShieldAlert className="w-4 h-4 shrink-0" />
             <span>{errorMsg}</span>
           </div>
         )}
 
         {/* Tab switch */}
-        <div className="flex rounded-xl bg-slate-950/60 p-1 border border-slate-800 mb-4">
+        <div className="flex rounded-xl bg-slate-950/60 p-1 border border-white/[0.08] mb-5">
           <button
             type="button"
             onClick={() => { setMode('login'); setErrorMsg(''); }}
-            className={`flex-1 py-2 text-xs font-bold rounded-lg transition ${
-              mode === 'login' ? 'bg-amber-500 text-slate-950 shadow' : 'text-slate-400 hover:text-white'
+            className={`flex-1 py-2 text-xs font-semibold rounded-lg transition cursor-pointer ${
+              mode === 'login' ? 'bg-amber-400 text-slate-950 font-bold shadow-sm' : 'text-slate-400 hover:text-white'
             }`}
           >
             Já Tenho Conta
@@ -170,8 +170,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
           <button
             type="button"
             onClick={() => { setMode('register'); setErrorMsg(''); }}
-            className={`flex-1 py-2 text-xs font-bold rounded-lg transition ${
-              mode === 'register' ? 'bg-amber-500 text-slate-950 shadow' : 'text-slate-400 hover:text-white'
+            className={`flex-1 py-2 text-xs font-semibold rounded-lg transition cursor-pointer ${
+              mode === 'register' ? 'bg-amber-400 text-slate-950 font-bold shadow-sm' : 'text-slate-400 hover:text-white'
             }`}
           >
             Criar Novo Cadastro
@@ -183,7 +183,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
           type="button"
           onClick={handleGoogleSignIn}
           disabled={isLoading}
-          className="w-full mb-4 py-2.5 px-4 rounded-xl bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs tracking-wide shadow flex items-center justify-center gap-2 transition active:scale-98"
+          className="w-full mb-4 py-2.5 px-4 rounded-xl bg-white hover:bg-slate-100 text-slate-900 font-semibold text-xs tracking-wide shadow flex items-center justify-center gap-2.5 transition active:scale-98 cursor-pointer"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -194,12 +194,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
           Continuar com Conta Google
         </button>
 
-        <div className="relative flex items-center justify-center my-3">
-          <div className="border-t border-slate-700 w-full" />
-          <span className="bg-slate-900 px-3 text-[11px] text-slate-400 uppercase tracking-widest">
-            ou com e-mail e senha
+        <div className="relative flex items-center justify-center my-4">
+          <div className="border-t border-white/[0.08] w-full" />
+          <span className="bg-slate-900 px-3 text-[11px] text-slate-500 uppercase tracking-widest font-mono">
+            ou com e-mail
           </span>
-          <div className="border-t border-slate-700 w-full" />
+          <div className="border-t border-white/[0.08] w-full" />
         </div>
 
         {/* Email & Password Form */}

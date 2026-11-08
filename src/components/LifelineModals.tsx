@@ -33,23 +33,23 @@ export const CardsModal: React.FC<CardsModalProps> = ({ isOpen, onClose, onCardS
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-fadeIn">
-      <div className="relative w-full max-w-lg rounded-2xl border-2 border-amber-400 bg-gradient-to-b from-slate-900 to-indigo-950 p-6 text-white shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-fadeIn font-sans-ui">
+      <div className="relative w-full max-w-lg rounded-3xl border border-amber-400/30 bg-slate-900 p-6 sm:p-8 text-slate-100 shadow-2xl">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-white transition"
+          className="absolute top-5 right-5 text-slate-400 hover:text-white transition-colors cursor-pointer"
           aria-label="Fechar"
         >
-          <X className="w-6 h-6" />
+          <X className="w-5 h-5" />
         </button>
 
         <div className="text-center mb-6">
-          <div className="inline-flex p-3 rounded-full bg-amber-500/20 text-amber-400 mb-2 border border-amber-500/40">
-            <Sparkles className="w-8 h-8" />
+          <div className="inline-flex p-3 rounded-2xl bg-amber-500/10 text-amber-400 mb-2 border border-amber-400/20">
+            <Sparkles className="w-6 h-6" />
           </div>
-          <h3 className="text-2xl font-bold tracking-wide text-amber-300">Cartas do Mestre</h3>
-          <p className="text-sm text-slate-300 mt-1">
-            Escolha uma das 4 cartas secretas para eliminar opções incorretas!
+          <h3 className="font-display text-xl sm:text-2xl font-bold tracking-wide text-amber-200">Cartas do Mestre</h3>
+          <p className="text-xs text-slate-300 mt-1 max-w-xs mx-auto">
+            Escolha uma das 4 cartas secretas para eliminar alternativas incorretas!
           </p>
         </div>
 
@@ -61,26 +61,26 @@ export const CardsModal: React.FC<CardsModalProps> = ({ isOpen, onClose, onCardS
                 key={idx}
                 disabled={revealed}
                 onClick={() => handlePick(idx)}
-                className={`relative aspect-[2/3] rounded-xl border-2 transition-all duration-500 transform ${
+                className={`relative aspect-[2/3] rounded-2xl border transition-all duration-300 cursor-pointer ${
                   revealed && isPicked
-                    ? 'border-amber-400 bg-amber-500/20 scale-105 shadow-lg shadow-amber-500/30'
-                    : 'border-amber-500/50 bg-gradient-to-br from-indigo-900 to-slate-900 hover:border-amber-400 hover:scale-105 active:scale-95'
+                    ? 'border-amber-400 bg-amber-500/20 scale-105 shadow-lg shadow-amber-950/40 ring-1 ring-amber-400/40'
+                    : 'border-white/[0.08] bg-slate-950/60 hover:border-amber-400/40 hover:-translate-y-1 active:translate-y-0'
                 } flex flex-col items-center justify-center p-3 text-center`}
               >
                 {revealed && (isPicked || selectedIdx !== null) ? (
                   <div className="flex flex-col items-center animate-fadeIn">
                     <span className="text-2xl mb-1">{card.eliminations === 0 ? '👑' : '🃏'}</span>
-                    <span className="text-xs font-bold text-amber-300">{card.name}</span>
-                    <span className="text-[11px] font-semibold text-emerald-400 mt-1">
+                    <span className="text-xs font-semibold text-amber-300">{card.name}</span>
+                    <span className="text-[11px] font-bold text-emerald-400 mt-1 font-data">
                       -{card.eliminations} {card.eliminations === 1 ? 'opção' : 'opções'}
                     </span>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center">
-                    <div className="w-10 h-10 rounded-full border border-amber-400/50 flex items-center justify-center text-amber-400 font-bold mb-2">
+                    <div className="w-10 h-10 rounded-xl border border-white/[0.08] bg-slate-900 flex items-center justify-center text-amber-400 font-bold mb-2">
                       ?
                     </div>
-                    <span className="text-xs font-semibold text-slate-300">Carta {idx + 1}</span>
+                    <span className="text-xs font-medium text-slate-300">Carta {idx + 1}</span>
                   </div>
                 )}
               </button>
@@ -89,7 +89,7 @@ export const CardsModal: React.FC<CardsModalProps> = ({ isOpen, onClose, onCardS
         </div>
 
         {revealed && selectedIdx !== null && (
-          <div className="text-center p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-sm animate-fadeIn">
+          <div className="text-center p-3 rounded-xl bg-amber-500/10 border border-amber-400/20 text-amber-200 text-xs sm:text-sm animate-fadeIn">
             Você tirou: <span className="font-bold text-white">{cards[selectedIdx].name}</span>! {cards[selectedIdx].desc}.
           </div>
         )}
@@ -300,60 +300,60 @@ export const StudyFeedbackModal: React.FC<StudyFeedbackModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm animate-fadeIn font-sans-ui">
       <div
-        className={`relative w-full max-w-lg rounded-2xl border-2 ${
-          isCorrect ? 'border-emerald-400 bg-gradient-to-b from-slate-900 via-slate-900 to-emerald-950' : 'border-rose-400 bg-gradient-to-b from-slate-900 via-slate-900 to-rose-950'
-        } p-6 text-white shadow-2xl max-h-[90vh] overflow-y-auto`}
+        className={`relative w-full max-w-lg rounded-3xl border ${
+          isCorrect ? 'border-emerald-400/50 bg-slate-900' : 'border-rose-400/50 bg-slate-900'
+        } p-6 sm:p-8 text-slate-100 shadow-2xl max-h-[90vh] overflow-y-auto`}
       >
-        <div className="text-center mb-4">
+        <div className="text-center mb-5">
           <div
-            className={`inline-flex p-3 rounded-full mb-2 border ${
-              isCorrect ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' : 'bg-rose-500/20 text-rose-400 border-rose-500/40'
+            className={`inline-flex p-3 rounded-2xl mb-2.5 border ${
+              isCorrect ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-rose-500/10 text-rose-400 border-rose-500/30'
             }`}
           >
-            {isCorrect ? <Check className="w-8 h-8" /> : <BookOpen className="w-8 h-8" />}
+            {isCorrect ? <Check className="w-7 h-7" /> : <BookOpen className="w-7 h-7" />}
           </div>
-          <h3 className={`text-2xl font-black tracking-wide ${isCorrect ? 'text-emerald-300' : 'text-rose-300'}`}>
+          <h3 className={`font-display text-xl sm:text-2xl font-bold tracking-wide ${isCorrect ? 'text-emerald-300' : 'text-rose-300'}`}>
             {isCorrect ? 'Certa Resposta! Glória a Deus!' : 'Resposta Incorreta! Vamos Aprender!'}
           </h3>
-          <p className="text-xs text-amber-300 font-bold uppercase tracking-widest mt-1">
+          <p className="text-xs text-amber-400 font-semibold uppercase tracking-widest mt-1 font-data">
             {isCorrect ? `+${rewardEarned.toLocaleString('pt-BR')} Bênçãos Acumuladas` : 'A Palavra de Deus nos Ensina'}
           </p>
         </div>
 
-        <div className="space-y-4 text-left">
-          <div className="p-3.5 rounded-xl bg-slate-800/80 border border-slate-700">
-            <span className="text-xs text-slate-400 block mb-1">Pergunta:</span>
-            <p className="text-sm font-semibold text-slate-200">{questionText}</p>
-            <div className="mt-2 pt-2 border-t border-slate-700/60 flex items-center gap-2">
-              <span className="text-xs text-slate-400">Resposta Correta:</span>
+        <div className="space-y-3.5 text-left">
+          <div className="p-4 rounded-2xl bg-slate-950/60 border border-white/[0.08]">
+            <span className="text-[11px] text-slate-400 uppercase tracking-wider block mb-1 font-semibold">Pergunta:</span>
+            <p className="text-xs sm:text-sm font-medium text-slate-200 leading-snug">{questionText}</p>
+            <div className="mt-2.5 pt-2.5 border-t border-white/[0.06] flex items-center gap-2">
+              <span className="text-xs text-slate-400 font-medium">Resposta Correta:</span>
               <span className="text-xs font-bold text-emerald-400">{correctAnswerText}</span>
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30">
-            <div className="flex items-center gap-2 text-amber-300 font-bold text-sm mb-1.5">
+          <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-400/20">
+            <div className="flex items-center gap-2 text-amber-300 font-semibold text-xs sm:text-sm mb-1.5">
               <BookOpen className="w-4 h-4 text-amber-400" />
               <span>Referência Bíblica: {biblicalReference}</span>
             </div>
-            <p className="text-sm text-slate-200 leading-relaxed">{explanation}</p>
+            <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">{explanation}</p>
           </div>
 
           {curiosity && (
-            <div className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs text-slate-300">
-              <span className="font-bold text-blue-300 block mb-0.5">💡 Curiosidade Bíblica:</span>
-              {curiosity}
+            <div className="p-3.5 rounded-2xl bg-sky-500/10 border border-sky-400/20 text-xs text-slate-300">
+              <span className="font-semibold text-sky-300 block mb-0.5">💡 Curiosidade Teológica:</span>
+              <p className="leading-relaxed">{curiosity}</p>
             </div>
           )}
         </div>
 
         <button
           onClick={onNext}
-          className={`w-full mt-6 py-3.5 rounded-xl text-white font-black text-base tracking-wide shadow-lg transition active:scale-98 ${
+          className={`w-full mt-6 py-3 rounded-xl font-bold text-sm tracking-wide transition cursor-pointer ${
             isCorrect
-              ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-emerald-900/50'
-              : 'bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 shadow-slate-900/50'
+              ? 'tactile-button-primary text-slate-950'
+              : 'bg-slate-800 hover:bg-slate-750 text-white border border-white/[0.08]'
           }`}
         >
           {isCorrect ? 'Avançar para o Próximo Nível →' : 'Ver Resultado da Partida →'}

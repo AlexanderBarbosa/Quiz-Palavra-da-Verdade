@@ -352,84 +352,132 @@ export default function App() {
     setEliminatedOptions(toEliminate);
   };
 
+  // Keyboard accessibility shortcuts (A, B, C, D or 1, 2, 3, 4, Enter, Space)
+  useEffect(() => {
+    if (!gameActive || confirmedAnswer || gameOver || showStudyFeedback) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+      const key = e.key.toUpperCase();
+      if (key === 'A' || key === '1') {
+        handleOptionSelect(0);
+      } else if (key === 'B' || key === '2') {
+        handleOptionSelect(1);
+      } else if (key === 'C' || key === '3') {
+        handleOptionSelect(2);
+      } else if (key === 'D' || key === '4') {
+        handleOptionSelect(3);
+      } else if (key === 'ENTER' || key === ' ') {
+        if (selectedOption !== null && !confirmedAnswer) {
+          e.preventDefault();
+          handleConfirmAnswer();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameActive, confirmedAnswer, gameOver, showStudyFeedback, selectedOption, currentQuestion, eliminatedOptions]);
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-amber-500 selection:text-slate-950 font-sans">
-      {/* Top Application Bar */}
-      <header className="sticky top-0 z-30 bg-slate-900/90 backdrop-blur-md border-b border-amber-500/30 px-3 sm:px-6 py-2.5 flex items-center justify-between shadow-lg">
-        {/* Brand / Logo */}
-        <div className="flex items-center gap-2.5">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 via-amber-500 to-amber-700 flex items-center justify-center text-slate-950 font-black text-xl shadow-md border-2 border-amber-300">
+    <div className="min-h-screen bg-divine-canvas text-slate-100 flex flex-col selection:bg-amber-500 selection:text-slate-950 font-sans-ui">
+      {/* Top Navigation Bar - Strict 3-Zone Contract */}
+      <header className="sticky top-0 z-30 bg-slate-950/80 backdrop-blur-md border-b border-white/[0.08] px-4 sm:px-8 py-3 flex items-center justify-between gap-6 shadow-sm">
+        {/* Zone 1: Brand Wordmark */}
+        <div className="flex items-center gap-3 shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 via-amber-500 to-amber-700 flex items-center justify-center text-slate-950 font-black text-lg shadow-[inset_0_1px_0_rgba(255,255,255,0.4)] border border-amber-300/60 shrink-0">
             ✝
           </div>
-          <div>
-            <h1 className="text-sm sm:text-base font-black tracking-wide bg-gradient-to-r from-amber-200 via-amber-400 to-amber-500 bg-clip-text text-transparent leading-tight">
-              Quiz Palavra da Verdade
-            </h1>
-            <span className="text-[10px] text-amber-300/80 font-bold uppercase tracking-widest hidden sm:inline-block">
-              Desafio Bíblico da Palavra de Deus
-            </span>
-          </div>
+          <span className="font-display font-bold text-base sm:text-lg tracking-wide text-amber-100 whitespace-nowrap">
+            Quiz Palavra da Verdade
+          </span>
         </div>
 
-        {/* Action Center */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Sound Toggle */}
+        {/* Zone 2: Single-Line Text Navigation Links */}
+        <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+          <button
+            onClick={() => {
+              if (gameActive) {
+                if (window.confirm('Deseja interromper o jogo atual e voltar à biblioteca?')) {
+                  setGameActive(false);
+                  setShowBibleStudy(true);
+                }
+              } else {
+                setShowBibleStudy(true);
+              }
+            }}
+            className="flex items-center gap-2 hover:text-amber-300 transition-colors whitespace-nowrap shrink-0"
+          >
+            <BookOpen className="w-4 h-4 text-amber-400/80" />
+            <span>Biblioteca Bíblica (66 Livros)</span>
+          </button>
+
+          <button
+            onClick={() => setShowLeaderboard(true)}
+            className="flex items-center gap-2 hover:text-amber-300 transition-colors whitespace-nowrap shrink-0"
+          >
+            <Trophy className="w-4 h-4 text-amber-400/80" />
+            <span>Mural da Honra</span>
+          </button>
+        </nav>
+
+        {/* Zone 3: Primary Actions (Audio Toggle + User Profile) */}
+        <div className="flex items-center gap-2.5 shrink-0">
+          {/* Sound Toggle with Equalizer */}
           <button
             onClick={toggleSound}
-            className={`group relative flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-300 border shadow-sm ${
+            className={`group relative flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
               isMuted
-                ? 'bg-slate-900/80 hover:bg-slate-800 text-slate-400 border-slate-700/80 hover:border-slate-600'
-                : 'bg-gradient-to-r from-emerald-950/60 via-slate-900 to-emerald-950/60 hover:from-emerald-900/60 text-emerald-300 border-emerald-500/50 shadow-emerald-950/40'
+                ? 'bg-slate-900/60 hover:bg-slate-900 text-slate-400 border-white/[0.08]'
+                : 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border-amber-500/30'
             }`}
-            title={isMuted ? 'Clique para ativar os efeitos sonoros' : 'Clique para silenciar os efeitos sonoros'}
+            title={isMuted ? 'Ativar som' : 'Desativar som'}
           >
-            <div className="relative flex items-center justify-center">
-              {isMuted ? (
-                <VolumeX className="w-4 h-4 text-rose-400 transition-transform group-hover:scale-110" />
-              ) : (
-                <Volume2 className="w-4 h-4 text-emerald-400 transition-transform group-hover:scale-110" />
-              )}
-            </div>
+            {isMuted ? (
+              <VolumeX className="w-4 h-4 text-rose-400/90" />
+            ) : (
+              <Volume2 className="w-4 h-4 text-amber-400" />
+            )}
 
-            <span className="hidden sm:inline-block font-semibold">
+            <span className="hidden sm:inline-block">
               {isMuted ? 'Mudo' : 'Som'}
             </span>
 
-            {/* Dynamic Equalizer sound waves animation when active */}
             {!isMuted && (
-              <span className="flex items-center gap-0.5 ml-0.5 h-3">
-                <span className="w-0.5 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                <span className="w-0.5 h-3 bg-emerald-300 rounded-full animate-pulse" style={{ animationDelay: '150ms' }} />
-                <span className="w-0.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" style={{ animationDelay: '300ms' }} />
+              <span className="flex items-center gap-0.5 ml-0.5 h-3" aria-hidden="true">
+                <span className="w-0.5 h-2 bg-amber-400 rounded-full animate-pulse" />
+                <span className="w-0.5 h-3 bg-amber-300 rounded-full animate-pulse" style={{ animationDelay: '150ms' }} />
+                <span className="w-0.5 h-1.5 bg-amber-400 rounded-full animate-pulse" style={{ animationDelay: '300ms' }} />
               </span>
             )}
           </button>
 
-          {/* Bible Study Library */}
+          {/* Quick Study Icon on Mobile */}
           <button
             onClick={() => setShowBibleStudy(true)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 text-xs font-bold border border-indigo-500/40 transition"
+            className="md:hidden p-2 rounded-lg bg-slate-900/60 text-slate-300 hover:text-white border border-white/[0.08]"
+            title="Estudo Bíblico"
           >
-            <BookOpen className="w-4 h-4 text-indigo-400" />
-            <span className="hidden md:inline">Estudos Bíblicos (Offline)</span>
+            <BookOpen className="w-4 h-4 text-amber-400" />
           </button>
 
-          {/* Leaderboard & Achievements */}
+          {/* Quick Ranking Icon on Mobile */}
           <button
             onClick={() => setShowLeaderboard(true)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-bold border border-amber-500/40 transition"
+            className="md:hidden p-2 rounded-lg bg-slate-900/60 text-slate-300 hover:text-white border border-white/[0.08]"
+            title="Ranking"
           >
             <Trophy className="w-4 h-4 text-amber-400" />
-            <span className="hidden md:inline">Ranking</span>
           </button>
 
           {/* Profile / Auth */}
           <button
             onClick={() => setShowAuthModal(true)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-200 text-xs font-bold border border-slate-700 transition"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-850 text-slate-200 text-xs font-semibold border border-white/[0.08] transition hover:border-amber-400/30"
           >
-            <span className="text-base">{user.avatarId || '🕊️'}</span>
-            <span className="hidden sm:inline max-w-[90px] truncate">{user.displayName}</span>
+            <span className="text-sm">{user.avatarId || '🕊️'}</span>
+            <span className="hidden sm:inline max-w-[100px] truncate">{user.displayName}</span>
           </button>
         </div>
       </header>
@@ -438,216 +486,218 @@ export default function App() {
       <main className="flex-1 flex flex-col">
         {!gameActive && !gameOver ? (
           /* ================= HOME & CATEGORY SELECTOR ================= */
-          <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 max-w-4xl mx-auto w-full">
-            {/* Hero Banner */}
-            <div className="text-center my-6 space-y-3">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-bold uppercase tracking-wider">
-                <Sparkles className="w-4 h-4" />
-                Desafio Bíblico Interativo para Toda a Família
-              </div>
+          <div className="flex-1 flex flex-col items-center justify-center px-4 py-8 sm:py-12 max-w-5xl mx-auto w-full">
+            {/* Editorial Hero Header */}
+            <div className="text-center my-4 space-y-3 max-w-2xl">
+              <p className="text-[11px] font-semibold tracking-widest text-amber-400/90 uppercase">
+                Desafio das Sagradas Escrituras
+              </p>
 
-              <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
-                Você Consegue Conquistar <br />
-                <span className="bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 bg-clip-text text-transparent drop-shadow-md">
+              <h2 className="font-display text-3xl sm:text-5xl font-extrabold text-slate-100 tracking-tight leading-tight text-balance">
+                Você Consegue Alcançar <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-400 to-yellow-500">
                   1 Milhão de Bênçãos?
                 </span>
               </h2>
 
-              <p className="text-sm sm:text-base text-slate-300 max-w-xl mx-auto leading-relaxed">
-                Aprenda a Palavra de Deus em cada pergunta, utilize as ajudas bíblicas,
-                suba de nível e compita no ranking global em tempo real!
+              <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-xl mx-auto">
+                Teste seus conhecimentos bíblicos através de 10 níveis progressivos.
+                Utilize as ajudas da igreja, consulte passagens sagradas e compita no mural global.
               </p>
 
-              {/* Anti-Repetition Assurance Pill */}
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 text-xs font-semibold">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Perguntas inéditas sem repetição a cada nova partida</span>
+              {/* Clean unboxed proof metadata with subtle typographic separators */}
+              <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs text-slate-400 pt-2">
+                <span className="text-emerald-400 font-medium">Perguntas Inéditas sem Repetição</span>
+                <span aria-hidden="true" className="text-slate-600">·</span>
+                <span>66 Livros Canônicos</span>
+                <span aria-hidden="true" className="text-slate-600">·</span>
+                <span>4 Categorias de Idade</span>
+                <span aria-hidden="true" className="text-slate-600">·</span>
+                <span>Mural em Tempo Real</span>
               </div>
             </div>
 
-            {/* Category Cards Grid */}
-            <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-4 my-4">
+            {/* Handcrafted Category Cards Grid */}
+            <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-4 my-6">
               {/* Kids Category */}
               <button
                 onClick={() => startNewGame('kids')}
-                className="group relative text-left p-5 rounded-2xl bg-gradient-to-br from-slate-900 via-sky-950/40 to-slate-900 border-2 border-sky-500/40 hover:border-sky-400 shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-98"
+                className="tactile-card group text-left p-6 rounded-2xl transition-all duration-200 hover:border-sky-400/40 hover:-translate-y-0.5 active:translate-y-0 flex flex-col justify-between"
               >
-                <div className="flex items-start justify-between">
-                  <div className="p-3 rounded-xl bg-sky-500/20 text-sky-400 border border-sky-500/30 text-2xl">
-                    👶
+                <div>
+                  <div className="flex items-center justify-between text-xs text-slate-400 mb-3">
+                    <span className="font-semibold text-sky-400">Pequenos Discípulos</span>
+                    <span className="text-slate-500 font-mono">5 a 11 anos</span>
                   </div>
-                  <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/30">
-                    5 a 11 anos
-                  </span>
+                  <h3 className="font-display text-xl font-bold text-white group-hover:text-sky-200 transition-colors">
+                    Histórias Bíblicas & Princípios
+                  </h3>
+                  <p className="text-xs text-slate-300 mt-2 leading-relaxed">
+                    Perguntas didáticas e inspiradoras sobre Noé, Davi e Golias, Daniel na cova dos leões, o nascimento de Jesus e os milagres do Evangelho.
+                  </p>
                 </div>
-                <h3 className="text-xl font-bold text-white mt-3 group-hover:text-sky-300 transition">
-                  Pequenos Discípulos
-                </h3>
-                <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                  Perguntas infantis didáticas sobre histórias marcantes: Noé, Davi, Daniel, Jesus e os animais da arca.
-                </p>
-                <div className="mt-4 flex items-center text-xs font-bold text-sky-400 group-hover:translate-x-1 transition">
-                  Iniciar Partida Infantil →
+                <div className="mt-5 pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs font-semibold text-sky-400 group-hover:text-sky-300">
+                  <span>Iniciar Partida Infantil</span>
+                  <span className="transition-transform group-hover:translate-x-1">→</span>
                 </div>
               </button>
 
               {/* Teens Category */}
               <button
                 onClick={() => startNewGame('teens')}
-                className="group relative text-left p-5 rounded-2xl bg-gradient-to-br from-slate-900 via-violet-950/40 to-slate-900 border-2 border-violet-500/40 hover:border-violet-400 shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-98"
+                className="tactile-card group text-left p-6 rounded-2xl transition-all duration-200 hover:border-violet-400/40 hover:-translate-y-0.5 active:translate-y-0 flex flex-col justify-between"
               >
-                <div className="flex items-start justify-between">
-                  <div className="p-3 rounded-xl bg-violet-500/20 text-violet-400 border border-violet-500/30 text-2xl">
-                    ⚡
+                <div>
+                  <div className="flex items-center justify-between text-xs text-slate-400 mb-3">
+                    <span className="font-semibold text-violet-400">Valentes da Fé</span>
+                    <span className="text-slate-500 font-mono">12 a 17 anos</span>
                   </div>
-                  <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-violet-500/20 text-violet-300 border border-violet-400/30">
-                    12 a 17 anos
-                  </span>
+                  <h3 className="font-display text-xl font-bold text-white group-hover:text-violet-200 transition-colors">
+                    Heróis, Parábolas & Coragem
+                  </h3>
+                  <p className="text-xs text-slate-300 mt-2 leading-relaxed">
+                    Desafios intermediários sobre a Armadura de Deus, as viagens missionárias de Paulo, as cartas dos apóstolos e a rainha Ester.
+                  </p>
                 </div>
-                <h3 className="text-xl font-bold text-white mt-3 group-hover:text-violet-300 transition">
-                  Valentes da Fé
-                </h3>
-                <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                  Nível intermediário sobre armadura de Deus, parábolas, Ester, profetas, coragem e cartas de Paulo.
-                </p>
-                <div className="mt-4 flex items-center text-xs font-bold text-violet-400 group-hover:translate-x-1 transition">
-                  Iniciar Partida Jovem →
+                <div className="mt-5 pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs font-semibold text-violet-400 group-hover:text-violet-300">
+                  <span>Iniciar Partida Jovem</span>
+                  <span className="transition-transform group-hover:translate-x-1">→</span>
                 </div>
               </button>
 
               {/* Adults Category */}
               <button
                 onClick={() => startNewGame('adults')}
-                className="group relative text-left p-5 rounded-2xl bg-gradient-to-br from-slate-900 via-amber-950/40 to-slate-900 border-2 border-amber-500/50 hover:border-amber-400 shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-98"
+                className="tactile-card group text-left p-6 rounded-2xl transition-all duration-200 hover:border-amber-400/50 hover:-translate-y-0.5 active:translate-y-0 flex flex-col justify-between"
               >
-                <div className="flex items-start justify-between">
-                  <div className="p-3 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 text-2xl">
-                    🛡️
+                <div>
+                  <div className="flex items-center justify-between text-xs text-slate-400 mb-3">
+                    <span className="font-semibold text-amber-400">Guerreiros da Palavra</span>
+                    <span className="text-slate-500 font-mono">Geral / Adultos</span>
                   </div>
-                  <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30">
-                    Geral / Adultos
-                  </span>
+                  <h3 className="font-display text-xl font-bold text-white group-hover:text-amber-200 transition-colors">
+                    Doutrina, Alianças & História
+                  </h3>
+                  <p className="text-xs text-slate-300 mt-2 leading-relaxed">
+                    Perguntas aprofundadas sobre o Tabernáculo, a Lei Mosaica, os profetas maiores e menores, cartas paulinas e teologia da salvação.
+                  </p>
                 </div>
-                <h3 className="text-xl font-bold text-white mt-3 group-hover:text-amber-300 transition">
-                  Guerreiros da Palavra
-                </h3>
-                <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                  Perguntas desafiadoras sobre teologia, alianças bíblicas, o Tabernáculo, livros proféticos e doutrina.
-                </p>
-                <div className="mt-4 flex items-center text-xs font-bold text-amber-400 group-hover:translate-x-1 transition">
-                  Iniciar Partida Adulto →
+                <div className="mt-5 pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs font-semibold text-amber-400 group-hover:text-amber-300">
+                  <span>Iniciar Partida Adulto</span>
+                  <span className="transition-transform group-hover:translate-x-1">→</span>
                 </div>
               </button>
 
-              {/* Masters / Theologians */}
+              {/* Masters Category */}
               <button
                 onClick={() => startNewGame('masters')}
-                className="group relative text-left p-5 rounded-2xl bg-gradient-to-br from-slate-900 via-emerald-950/40 to-slate-900 border-2 border-emerald-500/40 hover:border-emerald-400 shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-98"
+                className="tactile-card group text-left p-6 rounded-2xl transition-all duration-200 hover:border-emerald-400/40 hover:-translate-y-0.5 active:translate-y-0 flex flex-col justify-between"
               >
-                <div className="flex items-start justify-between">
-                  <div className="p-3 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-2xl">
-                    📜
+                <div>
+                  <div className="flex items-center justify-between text-xs text-slate-400 mb-3">
+                    <span className="font-semibold text-emerald-400">Mestres das Escrituras</span>
+                    <span className="text-slate-500 font-mono">Teológico / Avançado</span>
                   </div>
-                  <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
-                    Mestres / Avançado
-                  </span>
+                  <h3 className="font-display text-xl font-bold text-white group-hover:text-emerald-200 transition-colors">
+                    Exegese, Línguas Originais & Profecia
+                  </h3>
+                  <p className="text-xs text-slate-300 mt-2 leading-relaxed">
+                    Perguntas minuciosas sobre termos em hebraico/grego, escatologia bíblica, cronologia dos reis de Judá e Israel e contexto histórico apocalíptico.
+                  </p>
                 </div>
-                <h3 className="text-xl font-bold text-white mt-3 group-hover:text-emerald-300 transition">
-                  Mestres das Escrituras
-                </h3>
-                <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                  Perguntas aprofundadas com referências minuciosas, significados em hebraico/grego e escatologia bíblica.
-                </p>
-                <div className="mt-4 flex items-center text-xs font-bold text-emerald-400 group-hover:translate-x-1 transition">
-                  Iniciar Desafio Teológico →
+                <div className="mt-5 pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs font-semibold text-emerald-400 group-hover:text-emerald-300">
+                  <span>Iniciar Desafio Teológico</span>
+                  <span className="transition-transform group-hover:translate-x-1">→</span>
                 </div>
               </button>
             </div>
 
-            {/* Quick Actions Footer */}
-            <div className="flex flex-wrap items-center justify-center gap-3 my-4">
+            {/* Quick Actions Strip */}
+            <div className="flex flex-wrap items-center justify-center gap-3 my-2">
               <button
                 onClick={() => setShowBibleStudy(true)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 transition"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-xs font-medium text-slate-300 hover:text-white border border-white/[0.08] transition"
               >
-                <BookOpen className="w-4 h-4 text-indigo-400" />
-                Consultar Biblioteca Bíblica Offline
+                <BookOpen className="w-4 h-4 text-amber-400/80" />
+                <span>Explorar Biblioteca Bíblica Offline</span>
               </button>
+
               <button
                 onClick={() => setShowLeaderboard(true)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 transition"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-xs font-medium text-slate-300 hover:text-white border border-white/[0.08] transition"
               >
-                <Trophy className="w-4 h-4 text-amber-400" />
-                Ver Ranking Mundial
+                <Trophy className="w-4 h-4 text-amber-400/80" />
+                <span>Ver Mural da Honra</span>
               </button>
+
               <button
                 onClick={handleResetHistory}
-                className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-900/60 hover:bg-slate-800 border border-slate-800 text-xs font-semibold text-slate-400 hover:text-slate-200 transition"
-                title="Limpar o histórico de perguntas vistas para reiniciar o ciclo"
+                className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900/40 hover:bg-slate-900 text-xs font-medium text-slate-400 hover:text-slate-200 border border-white/[0.06] transition"
+                title="Reiniciar histórico de perguntas vistas neste dispositivo"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
-                Reiniciar Ciclo de Perguntas
+                <span>Reiniciar Ciclo de Perguntas</span>
               </button>
             </div>
 
-            {/* Reset Toast Notification */}
+            {/* Reset Toast */}
             {resetToast && (
-              <div className="fixed bottom-6 z-50 px-4 py-2 rounded-xl bg-emerald-900/90 border border-emerald-400 text-emerald-200 text-xs font-bold shadow-xl animate-fadeIn flex items-center gap-2">
+              <div className="fixed bottom-6 z-50 px-4 py-2.5 rounded-xl bg-emerald-950/90 border border-emerald-500/50 text-emerald-200 text-xs font-semibold shadow-2xl animate-fadeIn flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span>Histórico reiniciado! Todas as perguntas estão disponíveis novamente.</span>
+                <span>Histórico reiniciado. Todas as perguntas estão ativas novamente.</span>
               </div>
             )}
           </div>
         ) : gameActive && currentQuestion ? (
           /* ================= ACTIVE GAME ARENA ================= */
-          <div className="flex-1 flex flex-col md:flex-row max-w-7xl mx-auto w-full p-2 sm:p-4 gap-4">
+          <div className="flex-1 flex flex-col md:flex-row max-w-7xl mx-auto w-full p-3 sm:p-6 gap-6">
             {/* Left/Center: Question & Lifeline Arena */}
             <div className="flex-1 flex flex-col justify-between space-y-4">
-              {/* Prize Ribbon & Timer Bar */}
-              <div className="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-3 sm:p-4 shadow-xl flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center font-black text-amber-300 text-sm">
+              {/* Prize Ribbon & Timer Console */}
+              <div className="tactile-card rounded-2xl p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-400/30 flex items-center justify-center font-display font-bold text-amber-300 text-sm">
                     {currentTierIndex + 1}/10
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-400 uppercase tracking-widest block font-bold">
-                      Pergunta Valendo
+                    <span className="text-[10px] text-slate-400 uppercase tracking-widest block font-medium">
+                      Valendo Agora
                     </span>
-                    <span className="text-xl sm:text-2xl font-black text-amber-300">
-                      {currentStep.rewardCorrect.toLocaleString('pt-BR')} Bênçãos
+                    <span className="text-xl sm:text-2xl font-bold font-data text-amber-300 tracking-tight">
+                      {currentStep.rewardCorrect.toLocaleString('pt-BR')} <span className="text-sm font-sans-ui font-normal text-amber-400/80">Bênçãos</span>
                     </span>
                   </div>
                 </div>
 
-                {/* Acertar / Parar / Errar Summary */}
-                <div className="flex items-center gap-2 sm:gap-4 text-xs font-bold">
-                  <div className="bg-emerald-950/60 border border-emerald-500/40 px-2.5 py-1 rounded-lg text-emerald-300">
-                    <span className="text-[10px] text-emerald-400/80 block">ACERTAR</span>
-                    +{currentStep.rewardCorrect.toLocaleString('pt-BR')}
+                {/* Acertar / Parar / Errar Broadcast Strip */}
+                <div className="flex items-center gap-2 sm:gap-3 text-xs">
+                  <div className="bg-emerald-950/40 border border-emerald-500/30 px-3 py-1.5 rounded-xl text-emerald-300">
+                    <span className="text-[9px] uppercase tracking-wider text-emerald-400/80 block font-semibold">Acertar</span>
+                    <span className="font-data font-bold">+{currentStep.rewardCorrect.toLocaleString('pt-BR')}</span>
                   </div>
-                  <div className="bg-amber-950/60 border border-amber-500/40 px-2.5 py-1 rounded-lg text-amber-300">
-                    <span className="text-[10px] text-amber-400/80 block">PARAR</span>
-                    {currentStep.rewardStop.toLocaleString('pt-BR')}
+                  <div className="bg-amber-950/40 border border-amber-500/30 px-3 py-1.5 rounded-xl text-amber-300">
+                    <span className="text-[9px] uppercase tracking-wider text-amber-400/80 block font-semibold">Parar</span>
+                    <span className="font-data font-bold">{currentStep.rewardStop.toLocaleString('pt-BR')}</span>
                   </div>
-                  <div className="bg-rose-950/60 border border-rose-500/40 px-2.5 py-1 rounded-lg text-rose-300">
-                    <span className="text-[10px] text-rose-400/80 block">ERRAR</span>
-                    {currentStep.rewardWrong.toLocaleString('pt-BR')}
+                  <div className="bg-rose-950/40 border border-rose-500/30 px-3 py-1.5 rounded-xl text-rose-300">
+                    <span className="text-[9px] uppercase tracking-wider text-rose-400/80 block font-semibold">Errar</span>
+                    <span className="font-data font-bold">{currentStep.rewardWrong.toLocaleString('pt-BR')}</span>
                   </div>
                 </div>
 
-                {/* Suspense Timer */}
+                {/* Suspense Timer with Tabular Digits */}
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700">
+                  <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 border border-white/[0.08]">
                     <Clock className={`w-4 h-4 ${timeLeft <= 10 ? 'text-rose-400 animate-pulse' : 'text-amber-400'}`} />
-                    <span className={`font-mono font-bold text-sm ${timeLeft <= 10 ? 'text-rose-400' : 'text-slate-200'}`}>
-                      {timeLeft}s
+                    <span className={`font-data font-bold text-sm ${timeLeft <= 10 ? 'text-rose-400' : 'text-slate-200'}`}>
+                      {timeLeft < 10 ? `0${timeLeft}` : timeLeft}s
                     </span>
                   </div>
 
-                  {/* Mobile Ladder Drawer Trigger */}
+                  {/* Mobile Ladder Trigger */}
                   <button
                     onClick={() => setShowLadderDrawer(!showLadderDrawer)}
-                    className="md:hidden p-2 rounded-xl bg-slate-800 border border-slate-700 text-amber-400"
+                    className="md:hidden p-2 rounded-xl bg-slate-900 border border-white/[0.08] text-amber-400"
                     title="Ver escala de bênçãos"
                   >
                     <Layers className="w-4 h-4" />
@@ -656,20 +706,20 @@ export default function App() {
               </div>
 
               {/* Biblical Question Box */}
-              <div className="bg-gradient-to-b from-indigo-950/50 via-slate-900 to-slate-900 border-2 border-amber-400/60 rounded-3xl p-5 sm:p-7 shadow-2xl relative text-center flex flex-col justify-center min-h-[160px]">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <span className="text-[11px] font-bold uppercase tracking-widest text-amber-300 bg-amber-500/10 border border-amber-500/30 px-3 py-0.5 rounded-full">
-                    {currentTierIndex === 9 ? '👑 A PERGUNTA DO MILHÃO 👑' : `Nível ${currentTierIndex + 1} de 10`}
+              <div className="tactile-card rounded-3xl p-6 sm:p-8 text-center flex flex-col justify-center min-h-[170px] relative border-amber-400/30">
+                <div className="flex items-center justify-center gap-2 mb-3">
+                  <span className="text-[11px] font-semibold tracking-widest text-amber-400 uppercase font-data">
+                    {currentTierIndex === 9 ? 'A Grande Pergunta do Milhão' : `Escrituras Sagradas · Nível ${currentTierIndex + 1} de 10`}
                   </span>
                 </div>
 
-                <h3 className="text-lg sm:text-2xl font-black text-white leading-relaxed max-w-3xl mx-auto">
+                <h3 className="font-display text-lg sm:text-2xl font-bold text-slate-100 leading-snug max-w-3xl mx-auto text-balance">
                   {currentQuestion.question}
                 </h3>
               </div>
 
-              {/* 4 Alternative Choices (A, B, C, D) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* 4 Alternative Choices (A, B, C, D) with Tactile Keycaps & Keyboard Hints */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 {currentQuestion.options.map((optionText, idx) => {
                   const letter = ['A', 'B', 'C', 'D'][idx];
                   const isSelected = selectedOption === idx;
@@ -683,58 +733,71 @@ export default function App() {
                       key={idx}
                       disabled={isConfirmed || isEliminated}
                       onClick={() => handleOptionSelect(idx)}
-                      className={`relative flex items-center p-3.5 sm:p-4 rounded-2xl border-2 transition-all duration-200 text-left ${
+                      className={`relative flex items-center p-4 rounded-2xl border transition-all duration-150 text-left cursor-pointer group ${
                         isEliminated
-                          ? 'opacity-25 border-slate-800 bg-slate-900 cursor-not-allowed line-through'
+                          ? 'opacity-25 border-slate-800 bg-slate-900/40 cursor-not-allowed line-through'
                           : isRight
-                          ? 'border-emerald-400 bg-emerald-600/30 shadow-lg shadow-emerald-500/30 scale-[1.01]'
+                          ? 'border-emerald-400/80 bg-emerald-950/50 shadow-lg shadow-emerald-950/50 scale-[1.01]'
                           : isWrong
-                          ? 'border-rose-500 bg-rose-600/30 shadow-lg shadow-rose-500/30'
+                          ? 'border-rose-500/80 bg-rose-950/50 shadow-lg shadow-rose-950/50'
                           : isSelected
-                          ? 'border-amber-400 bg-gradient-to-r from-amber-500/30 to-amber-600/20 shadow-lg shadow-amber-500/30 scale-[1.01]'
-                          : 'border-slate-700 bg-slate-900/80 hover:border-amber-400/70 hover:bg-slate-850 active:scale-98'
+                          ? 'border-amber-400 bg-amber-950/30 shadow-lg shadow-amber-950/40 ring-1 ring-amber-400/40 scale-[1.01]'
+                          : 'border-white/[0.08] bg-slate-900/60 hover:bg-slate-900 hover:border-amber-400/40 active:translate-y-0.5'
                       }`}
                     >
-                      {/* Letter Badge */}
+                      {/* Tactile Keycap Letter */}
                       <span
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center font-black text-sm shrink-0 mr-3 border ${
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center font-data font-bold text-sm shrink-0 mr-3 border transition-colors ${
                           isRight
-                            ? 'bg-emerald-500 text-slate-950 border-white'
+                            ? 'bg-emerald-500 text-slate-950 border-emerald-300'
                             : isWrong
-                            ? 'bg-rose-500 text-white border-white'
+                            ? 'bg-rose-500 text-white border-rose-300'
                             : isSelected
-                            ? 'bg-amber-400 text-slate-950 border-white'
-                            : 'bg-slate-800 text-amber-300 border-slate-700'
+                            ? 'bg-amber-400 text-slate-950 border-amber-200'
+                            : 'bg-slate-800/80 text-amber-300 border-white/[0.08] group-hover:border-amber-400/40'
                         }`}
                       >
                         {letter}
                       </span>
 
-                      {/* Text */}
-                      <span className={`text-xs sm:text-sm font-semibold flex-1 ${isSelected ? 'text-white font-bold' : 'text-slate-200'}`}>
+                      {/* Option Text */}
+                      <span className={`text-xs sm:text-sm font-medium flex-1 ${isSelected ? 'text-white font-semibold' : 'text-slate-200'}`}>
                         {optionText}
                       </span>
+
+                      {/* Non-Hue Status Icons & Keyboard Shortcut Clue */}
+                      <div className="ml-2 shrink-0">
+                        {isRight ? (
+                          <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                        ) : isWrong ? (
+                          <AlertCircle className="w-5 h-5 text-rose-400" />
+                        ) : (
+                          <span className="hidden sm:inline-block text-[10px] font-mono text-slate-500 uppercase px-1.5 py-0.5 rounded border border-white/[0.05] group-hover:text-amber-400/70">
+                            [{letter}]
+                          </span>
+                        )}
+                      </div>
                     </button>
                   );
                 })}
               </div>
 
-              {/* Action & Lifeline Control Bar */}
-              <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3 shadow-xl">
+              {/* Action & Lifeline Dock */}
+              <div className="tactile-card rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
                 {/* Lifeline Buttons */}
                 <div className="flex flex-wrap items-center gap-2">
                   {/* Cartas */}
                   <button
                     disabled={usedCards || confirmedAnswer}
                     onClick={() => setShowCardsModal(true)}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border transition ${
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border transition ${
                       usedCards
-                        ? 'opacity-40 border-slate-800 bg-slate-900 text-slate-500 cursor-not-allowed'
-                        : 'border-amber-500/50 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 active:scale-95'
+                        ? 'opacity-30 border-white/[0.05] bg-slate-900 text-slate-500 cursor-not-allowed'
+                        : 'border-white/[0.08] bg-slate-900/80 text-amber-300 hover:bg-slate-850 hover:border-amber-400/40 active:translate-y-0.5'
                     }`}
                     title="Elimine de 1 a 3 alternativas incorretas"
                   >
-                    <Sparkles className="w-3.5 h-3.5" />
+                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                     <span>Cartas</span>
                   </button>
 
@@ -746,14 +809,14 @@ export default function App() {
                       setUsedGuests(true);
                       sound.playLifeline();
                     }}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border transition ${
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border transition ${
                       usedGuests
-                        ? 'opacity-40 border-slate-800 bg-slate-900 text-slate-500 cursor-not-allowed'
-                        : 'border-blue-500/50 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20 active:scale-95'
+                        ? 'opacity-30 border-white/[0.05] bg-slate-900 text-slate-500 cursor-not-allowed'
+                        : 'border-white/[0.08] bg-slate-900/80 text-sky-300 hover:bg-slate-850 hover:border-sky-400/40 active:translate-y-0.5'
                     }`}
                     title="Veja a votação dos estudantes da Bíblia"
                   >
-                    <Users className="w-3.5 h-3.5" />
+                    <Users className="w-3.5 h-3.5 text-sky-400" />
                     <span>Estudiosos</span>
                   </button>
 
@@ -765,14 +828,14 @@ export default function App() {
                       setUsedElders(true);
                       sound.playLifeline();
                     }}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border transition ${
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border transition ${
                       usedElders
-                        ? 'opacity-40 border-slate-800 bg-slate-900 text-slate-500 cursor-not-allowed'
-                        : 'border-emerald-500/50 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 active:scale-95'
+                        ? 'opacity-30 border-white/[0.05] bg-slate-900 text-slate-500 cursor-not-allowed'
+                        : 'border-white/[0.08] bg-slate-900/80 text-emerald-300 hover:bg-slate-850 hover:border-emerald-400/40 active:translate-y-0.5'
                     }`}
                     title="Ouça o conselho de 3 anciãos"
                   >
-                    <Award className="w-3.5 h-3.5" />
+                    <Award className="w-3.5 h-3.5 text-emerald-400" />
                     <span>Placas</span>
                   </button>
 
@@ -780,40 +843,40 @@ export default function App() {
                   <button
                     disabled={skipsRemaining <= 0 || confirmedAnswer}
                     onClick={handleSkipQuestion}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border transition ${
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border transition ${
                       skipsRemaining <= 0
-                        ? 'opacity-40 border-slate-800 bg-slate-900 text-slate-500 cursor-not-allowed'
-                        : 'border-purple-500/50 bg-purple-500/10 text-purple-300 hover:bg-purple-500/20 active:scale-95'
+                        ? 'opacity-30 border-white/[0.05] bg-slate-900 text-slate-500 cursor-not-allowed'
+                        : 'border-white/[0.08] bg-slate-900/80 text-violet-300 hover:bg-slate-850 hover:border-violet-400/40 active:translate-y-0.5'
                     }`}
                     title="Pular esta pergunta sem perder pontuação"
                   >
-                    <SkipForward className="w-3.5 h-3.5" />
+                    <SkipForward className="w-3.5 h-3.5 text-violet-400" />
                     <span>Pular ({skipsRemaining})</span>
                   </button>
                 </div>
 
-                {/* Confirm & Stop Buttons */}
-                <div className="flex items-center gap-2 w-full sm:w-auto">
+                {/* Confirm & Stop Controls */}
+                <div className="flex items-center gap-2.5 w-full sm:w-auto">
                   {/* Parar */}
                   <button
                     disabled={confirmedAnswer}
                     onClick={handleStopMatch}
-                    className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 font-bold text-xs tracking-wide transition active:scale-95"
+                    className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-850 text-slate-300 hover:text-white border border-white/[0.08] font-semibold text-xs transition active:translate-y-0.5"
                   >
                     Parar e Levar ({currentStep.rewardStop.toLocaleString('pt-BR')})
                   </button>
 
-                  {/* Você tem certeza? / Confirmar */}
+                  {/* Confirmar */}
                   <button
                     disabled={selectedOption === null || confirmedAnswer}
                     onClick={handleConfirmAnswer}
-                    className={`flex-1 sm:flex-initial px-6 py-2.5 rounded-xl font-black text-xs sm:text-sm tracking-wide shadow-lg transition active:scale-95 ${
+                    className={`flex-1 sm:flex-initial px-6 py-2.5 rounded-xl font-bold text-xs sm:text-sm tracking-wide transition ${
                       selectedOption !== null && !confirmedAnswer
-                        ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 shadow-amber-900/40 animate-pulse'
-                        : 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed'
+                        ? 'tactile-button-primary text-slate-950 font-extrabold cursor-pointer'
+                        : 'bg-slate-900 text-slate-500 border border-white/[0.05] cursor-not-allowed'
                     }`}
                   >
-                    Confirmar Resposta!
+                    Confirmar Resposta
                   </button>
                 </div>
               </div>
@@ -821,14 +884,14 @@ export default function App() {
 
             {/* Right: The Ladder Steps (Desktop & Mobile Drawer) */}
             <aside
-              className={`fixed inset-y-0 right-0 z-50 md:static md:z-auto w-72 bg-slate-900 border-l md:border border-amber-500/30 md:rounded-2xl p-4 flex flex-col justify-between shadow-2xl transition-transform duration-300 ${
+              className={`fixed inset-y-0 right-0 z-50 md:static md:z-auto w-72 tactile-card border-l md:border border-white/[0.08] md:rounded-2xl p-4 flex flex-col justify-between shadow-2xl transition-transform duration-300 ${
                 showLadderDrawer ? 'translate-x-0' : 'translate-x-full md:translate-x-0'
               }`}
             >
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
                 <div className="flex items-center gap-2">
-                  <Crown className="w-5 h-5 text-amber-400" />
-                  <span className="font-bold text-sm text-amber-200">Escala de Bênçãos</span>
+                  <Crown className="w-4 h-4 text-amber-400" />
+                  <span className="font-display font-bold text-sm text-amber-200">Escala de Bênçãos</span>
                 </div>
                 <button
                   onClick={() => setShowLadderDrawer(false)}
@@ -845,79 +908,91 @@ export default function App() {
                   const isCurrent = stepIndex === currentTierIndex;
                   const isPassed = stepIndex < currentTierIndex;
                   const isMillion = step.tier === 10;
+                  const isSafeHaven = step.tier === 5;
 
                   return (
                     <div
                       key={step.tier}
-                      className={`flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-bold border transition ${
+                      className={`flex items-center justify-between px-3 py-1.5 rounded-xl text-xs border transition ${
                         isCurrent
-                          ? 'border-amber-400 bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/20 font-black'
+                          ? 'border-amber-400 bg-amber-400 text-slate-950 font-bold shadow-md shadow-amber-950/40'
                           : isPassed
-                          ? 'border-emerald-500/30 bg-emerald-950/30 text-emerald-400'
+                          ? 'border-emerald-500/20 bg-emerald-950/20 text-emerald-400'
                           : isMillion
-                          ? 'border-amber-500/40 bg-amber-950/20 text-amber-300'
-                          : 'border-slate-800 bg-slate-950/60 text-slate-400'
+                          ? 'border-amber-500/30 bg-amber-950/15 text-amber-300 font-semibold'
+                          : isSafeHaven
+                          ? 'border-sky-500/30 bg-sky-950/15 text-sky-300 font-semibold'
+                          : 'border-white/[0.04] bg-slate-900/40 text-slate-400'
                       }`}
                     >
-                      <span className="flex items-center gap-1.5">
-                        <span className="text-[10px] w-4">{step.tier}.</span>
-                        <span>{isMillion ? '👑 1 MILHÃO' : `${step.rewardCorrect.toLocaleString('pt-BR')}`}</span>
+                      <span className="flex items-center gap-1.5 font-data">
+                        <span className="text-[10px] w-4 opacity-60">{step.tier}.</span>
+                        <span>{isMillion ? '👑 1.000.000' : `${step.rewardCorrect.toLocaleString('pt-BR')}`}</span>
                       </span>
-                      <span>
-                        {isCurrent ? '▶ ATUAL' : isPassed ? '✓' : ''}
-                      </span>
+
+                      <div className="flex items-center gap-1.5 text-[10px] font-sans-ui">
+                        {isSafeHaven && !isCurrent && (
+                          <span className="text-[9px] text-sky-400/80 uppercase font-semibold">Piso Seguro</span>
+                        )}
+                        {isCurrent ? (
+                          <span className="font-bold tracking-wider">▶ ATUAL</span>
+                        ) : isPassed ? (
+                          <span className="text-emerald-400">✓</span>
+                        ) : null}
+                      </div>
                     </div>
                   );
                 })}
               </div>
 
-              <div className="pt-3 border-t border-slate-800 text-[11px] text-slate-400 text-center">
-                Categoria: <strong className="text-amber-300 capitalize">{selectedCategory}</strong>
+              <div className="pt-3 border-t border-white/[0.08] text-[11px] text-slate-400 text-center flex items-center justify-center gap-2">
+                <span>Categoria:</span>
+                <span className="text-amber-300 font-semibold capitalize">{selectedCategory}</span>
               </div>
             </aside>
           </div>
         ) : gameOver ? (
           /* ================= MATCH OVER / VICTORY SUMMARY ================= */
           <div className="flex-1 flex items-center justify-center p-4 sm:p-6 animate-fadeIn">
-            <div className="max-w-md w-full bg-gradient-to-b from-slate-900 to-indigo-950 border-2 border-amber-400 rounded-3xl p-6 sm:p-8 text-center shadow-2xl space-y-5">
-              <div className="w-16 h-16 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center mx-auto text-3xl">
+            <div className="max-w-md w-full tactile-card rounded-3xl p-6 sm:p-8 text-center space-y-6">
+              <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-400/30 text-amber-400 flex items-center justify-center mx-auto text-3xl shadow-inner">
                 {matchFinishedReason === 'won' ? '👑' : matchFinishedReason === 'stopped' ? '🛡️' : '📖'}
               </div>
 
               <div>
-                <span className="text-xs font-bold uppercase tracking-widest text-amber-300 block mb-1">
+                <span className="text-xs font-semibold uppercase tracking-widest text-amber-400 block mb-1">
                   Resultado da Partida
                 </span>
-                <h3 className="text-2xl sm:text-3xl font-black text-white">
+                <h3 className="font-display text-2xl sm:text-3xl font-bold text-white text-balance">
                   {matchFinishedReason === 'won'
-                    ? 'GLÓRIA A DEUS! 1 MILHÃO!'
+                    ? 'Glória a Deus! 1 Milhão de Bênçãos!'
                     : matchFinishedReason === 'stopped'
-                    ? 'Parou com Sabedoria!'
-                    : 'Fim de Partida! Continue Estudando!'}
+                    ? 'Parou com Sabedoria'
+                    : 'Fim de Partida. Continue Estudando!'}
                 </h3>
               </div>
 
-              <div className="p-4 rounded-2xl bg-black/40 border border-amber-500/30 space-y-2">
-                <span className="text-xs text-slate-400 block">Bênçãos Conquistadas Nesta Partida</span>
-                <span className="text-3xl sm:text-4xl font-black text-amber-300">
+              <div className="p-4 rounded-2xl bg-black/30 border border-white/[0.08] space-y-2">
+                <span className="text-xs text-slate-400 block">Bênçãos Conquistadas</span>
+                <span className="text-3xl sm:text-4xl font-bold font-data text-amber-300 block">
                   {finalMatchScore.toLocaleString('pt-BR')}
                 </span>
-                <span className="text-xs text-emerald-400 block font-semibold">
-                  Pontos somados ao seu perfil e ranking global!
+                <span className="text-xs text-emerald-400 block font-medium">
+                  Pontos somados ao seu perfil e ao mural global
                 </span>
               </div>
 
               {recentAchievements.length > 0 && (
-                <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-left space-y-1">
-                  <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-left space-y-1.5">
+                  <span className="text-xs font-semibold text-amber-300 flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5" />
                     Nova(s) Conquista(s) Desbloqueada(s)!
                   </span>
                   {recentAchievements.map((achId) => {
                     const ach = ACHIEVEMENTS.find((a) => a.id === achId);
                     return (
-                      <p key={achId} className="text-xs text-slate-200 font-semibold">
-                        🏆 {ach?.title}: <span className="text-slate-400 font-normal">{ach?.description}</span>
+                      <p key={achId} className="text-xs text-slate-200">
+                        🏆 <strong className="text-white">{ach?.title}:</strong> <span className="text-slate-400">{ach?.description}</span>
                       </p>
                     );
                   })}
@@ -927,7 +1002,7 @@ export default function App() {
               <div className="flex flex-col gap-2.5 pt-2">
                 <button
                   onClick={() => startNewGame(selectedCategory)}
-                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm tracking-wide shadow-lg shadow-amber-900/40 transition active:scale-98"
+                  className="w-full py-3 rounded-xl tactile-button-primary text-slate-950 font-bold text-sm tracking-wide transition cursor-pointer"
                 >
                   Jogar Novamente Nesta Categoria
                 </button>
@@ -937,7 +1012,7 @@ export default function App() {
                       setGameOver(false);
                       setShowLeaderboard(true);
                     }}
-                    className="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs border border-slate-700 transition"
+                    className="flex-1 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-850 text-white font-semibold text-xs border border-white/[0.08] transition"
                   >
                     Ver Ranking
                   </button>
@@ -946,9 +1021,9 @@ export default function App() {
                       setGameOver(false);
                       setShowBibleStudy(true);
                     }}
-                    className="flex-1 py-2.5 rounded-xl bg-indigo-900/60 hover:bg-indigo-800 text-indigo-200 font-bold text-xs border border-indigo-500/30 transition"
+                    className="flex-1 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-850 text-amber-300 font-semibold text-xs border border-white/[0.08] transition"
                   >
-                    Estudo Bíblico
+                    Estudar Bíblia
                   </button>
                 </div>
               </div>

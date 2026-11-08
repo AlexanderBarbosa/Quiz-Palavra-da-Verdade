@@ -87,49 +87,50 @@ export const BibleStudyView: React.FC<BibleStudyViewProps> = ({ onClose, onStart
   });
 
   return (
-    <div className="fixed inset-0 z-40 bg-slate-950/95 flex flex-col backdrop-blur-md overflow-hidden text-white animate-fadeIn">
+    <div className="fixed inset-0 z-40 bg-slate-950/95 flex flex-col backdrop-blur-md overflow-hidden text-slate-100 animate-fadeIn font-sans-ui">
       {/* Top Header */}
-      <header className="p-4 sm:p-5 border-b border-indigo-500/30 bg-slate-900/80 flex items-center justify-between">
+      <header className="px-5 py-4 border-b border-white/[0.08] bg-slate-900/80 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/40">
-            <BookOpen className="w-6 h-6" />
+          <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-400/30 flex items-center justify-center text-amber-400">
+            <BookOpen className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-xl sm:text-2xl font-black text-indigo-200 tracking-wide">
-              Biblioteca de Estudos Bíblicos
+            <h2 className="font-display text-lg sm:text-xl font-bold text-amber-100 tracking-wide">
+              Biblioteca Bíblica de Estudos
             </h2>
             <p className="text-xs text-slate-400">
-              Acesso 100% offline para aprofundar seu conhecimento na Palavra
+              Todos os 66 livros canônicos, dicionário de termos originais e devocionais 100% offline
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <button
             onClick={onStartQuiz}
-            className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs tracking-wide shadow-md transition active:scale-95"
+            className="px-4 py-2 rounded-xl tactile-button-primary text-slate-950 font-bold text-xs tracking-wide transition cursor-pointer"
           >
             Jogar Quiz
           </button>
           <button
             onClick={onClose}
-            className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-semibold text-xs transition border border-slate-700"
+            className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-850 text-slate-300 hover:text-white font-medium text-xs transition border border-white/[0.08]"
           >
             Fechar
           </button>
         </div>
       </header>
 
-      {/* Tabs */}
-      <div className="flex overflow-x-auto border-b border-slate-800 px-4 sm:px-6 bg-slate-900/50 scrollbar-none">
+      {/* Tabs - Clean Segmented Control */}
+      <div className="flex overflow-x-auto border-b border-white/[0.08] px-4 sm:px-8 bg-slate-900/40 scrollbar-none gap-2">
         {[
-          { id: 'books', label: 'Panorama dos Livros', icon: BookOpen },
-          { id: 'glossary', label: 'Dicionário Bíblico', icon: Sparkles },
+          { id: 'books', label: 'Panorama dos 66 Livros', icon: BookOpen },
+          { id: 'glossary', label: 'Termos & Dicionário', icon: Sparkles },
           { id: 'topics', label: 'Temas & Orações', icon: Bookmark },
           { id: 'daily', label: 'Versículo do Dia', icon: BookMarked },
           { id: 'notes', label: `Meu Caderno (${notes.length})`, icon: Plus },
         ].map(tab => {
           const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
@@ -137,13 +138,13 @@ export const BibleStudyView: React.FC<BibleStudyViewProps> = ({ onClose, onStart
                 setActiveTab(tab.id as typeof activeTab);
                 setSearchQuery('');
               }}
-              className={`py-3 px-4 font-bold text-xs sm:text-sm border-b-2 flex items-center gap-2 whitespace-nowrap transition ${
-                activeTab === tab.id
-                  ? 'border-indigo-400 text-indigo-300'
+              className={`py-3 px-3.5 font-medium text-xs sm:text-sm border-b-2 flex items-center gap-2 whitespace-nowrap transition-colors ${
+                isActive
+                  ? 'border-amber-400 text-amber-300 font-semibold'
                   : 'border-transparent text-slate-400 hover:text-slate-200'
               }`}
             >
-              <Icon className="w-4 h-4" />
+              <Icon className="w-4 h-4 text-amber-400/80" />
               {tab.label}
             </button>
           );
@@ -152,20 +153,20 @@ export const BibleStudyView: React.FC<BibleStudyViewProps> = ({ onClose, onStart
 
       {/* Tab Content */}
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">
-        <div className="max-w-4xl mx-auto space-y-6">
+        <div className="max-w-5xl mx-auto space-y-6">
 
           {/* TAB 1: BOOKS PANORAMA */}
           {activeTab === 'books' && (
             <div className="space-y-4">
               <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
-                <div className="relative w-full sm:w-72">
-                  <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+                <div className="relative w-full sm:w-80">
+                  <Search className="w-4 h-4 absolute left-3.5 top-3 text-slate-400" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
-                    placeholder="Buscar livro, autor ou tema..."
-                    className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-slate-500 text-xs sm:text-sm focus:outline-none focus:border-indigo-400"
+                    placeholder="Buscar por livro, autor ou tema..."
+                    className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-900 border border-white/[0.08] text-white placeholder-slate-500 text-xs sm:text-sm focus:outline-none focus:border-amber-400/60"
                   />
                 </div>
 
@@ -177,10 +178,10 @@ export const BibleStudyView: React.FC<BibleStudyViewProps> = ({ onClose, onStart
                         setTestamentFilter(testament);
                         setSelectedBookCategory('all');
                       }}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition ${
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition ${
                         testamentFilter === testament
-                          ? 'bg-indigo-600 text-white border-indigo-400'
-                          : 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700'
+                          ? 'bg-amber-400 text-slate-950 border-amber-300 font-bold shadow-sm'
+                          : 'bg-slate-900/80 text-slate-400 border-white/[0.08] hover:bg-slate-850 hover:text-slate-200'
                       }`}
                     >
                       {testament === 'all' ? 'Todos (66)' : testament === 'Antigo Testamento' ? 'Antigo Testamento (39)' : 'Novo Testamento (27)'}
@@ -189,7 +190,7 @@ export const BibleStudyView: React.FC<BibleStudyViewProps> = ({ onClose, onStart
                 </div>
               </div>
 
-              {/* Category Pills */}
+              {/* Category Segmented Controls */}
               <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
                 {[
                   { id: 'all', label: 'Todas as Seções' },
@@ -206,10 +207,10 @@ export const BibleStudyView: React.FC<BibleStudyViewProps> = ({ onClose, onStart
                   <button
                     key={cat.id}
                     onClick={() => setSelectedBookCategory(cat.id)}
-                    className={`px-2.5 py-1 rounded-full whitespace-nowrap text-[11px] font-semibold border transition ${
+                    className={`px-2.5 py-1 rounded-lg whitespace-nowrap text-xs font-medium border transition ${
                       selectedBookCategory === cat.id
-                        ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-sm'
-                        : 'bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800'
+                        ? 'bg-amber-500/20 text-amber-300 border-amber-400/40 font-semibold'
+                        : 'bg-slate-900/50 text-slate-400 border-white/[0.06] hover:bg-slate-850 hover:text-slate-300'
                     }`}
                   >
                     {cat.label}
@@ -217,15 +218,15 @@ export const BibleStudyView: React.FC<BibleStudyViewProps> = ({ onClose, onStart
                 ))}
               </div>
 
-              {/* Total Books Banner */}
+              {/* Total Books Counter with clean unboxed text */}
               <div className="flex items-center justify-between text-xs text-slate-400 px-1">
                 <span>
-                  Exibindo <strong className="text-amber-300">{filteredBooks.length}</strong> de <strong className="text-white">66 livros da Bíblia</strong>
+                  Exibindo <strong className="text-amber-300 font-data">{filteredBooks.length}</strong> de <strong className="text-white font-data">66 livros</strong>
                 </span>
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery('')}
-                    className="text-amber-400 hover:underline"
+                    className="text-amber-400 hover:underline cursor-pointer"
                   >
                     Limpar busca
                   </button>
@@ -233,29 +234,34 @@ export const BibleStudyView: React.FC<BibleStudyViewProps> = ({ onClose, onStart
               </div>
 
               {/* Books Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5">
                 {filteredBooks.map(book => (
                   <button
                     key={book.name}
                     onClick={() => setSelectedBook(book)}
-                    className="text-left p-4 rounded-xl border border-slate-800 bg-slate-900/80 hover:bg-slate-850 hover:border-indigo-500/50 transition p-4 flex flex-col justify-between"
+                    className="text-left p-4 rounded-2xl tactile-card hover:border-amber-400/40 transition-all flex flex-col justify-between cursor-pointer group hover:-translate-y-0.5"
                   >
                     <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-black text-base text-indigo-200">{book.name}</span>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-medium">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="font-display font-bold text-base text-white group-hover:text-amber-300 transition-colors">
+                          {book.name}
+                        </span>
+                        <span className="text-[11px] font-data text-slate-400">
                           {book.chapters} caps
                         </span>
                       </div>
-                      <span className="text-xs text-amber-400/90 font-medium block mb-1">
-                        {book.category} • {book.author}
-                      </span>
-                      <p className="text-xs text-slate-300 line-clamp-2 mt-1">
+                      {/* Clean unboxed metadata with bullet separator */}
+                      <div className="text-[11px] text-amber-400/80 mb-2 flex items-center gap-1.5">
+                        <span>{book.category}</span>
+                        <span aria-hidden="true" className="text-slate-600">·</span>
+                        <span className="text-slate-300">{book.author}</span>
+                      </div>
+                      <p className="text-xs text-slate-300 line-clamp-2 leading-relaxed">
                         {book.summary}
                       </p>
                     </div>
-                    <div className="mt-3 pt-2 border-t border-slate-800 text-[11px] text-indigo-300/80 italic line-clamp-1">
-                      {book.keyVerse}
+                    <div className="mt-3 pt-2.5 border-t border-white/[0.06] text-[11px] text-amber-200/80 italic font-serif line-clamp-1">
+                      "{book.keyVerse}"
                     </div>
                   </button>
                 ))}
@@ -468,39 +474,42 @@ export const BibleStudyView: React.FC<BibleStudyViewProps> = ({ onClose, onStart
       {/* Selected Book Modal */}
       {selectedBook && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-fadeIn">
-          <div className="relative w-full max-w-lg rounded-2xl border-2 border-indigo-400 bg-gradient-to-b from-slate-900 to-indigo-950 p-6 text-white shadow-2xl">
+          <div className="relative w-full max-w-lg rounded-3xl border border-amber-400/30 bg-slate-900 p-6 sm:p-8 text-slate-100 shadow-2xl">
             <button
               onClick={() => setSelectedBook(null)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white text-xl"
+              className="absolute top-5 right-5 text-slate-400 hover:text-white text-lg transition-colors cursor-pointer"
             >
               ✕
             </button>
-            <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
-              {selectedBook.testament} • {selectedBook.category}
-            </span>
-            <h3 className="text-2xl font-black text-white mt-1 mb-2">{selectedBook.name}</h3>
+            <div className="text-xs font-medium text-amber-400 uppercase tracking-widest flex items-center gap-2 mb-1">
+              <span>{selectedBook.testament}</span>
+              <span aria-hidden="true" className="text-slate-600">·</span>
+              <span>{selectedBook.category}</span>
+            </div>
+            <h3 className="font-display text-2xl sm:text-3xl font-bold text-white mb-2">{selectedBook.name}</h3>
 
-            <div className="space-y-3 text-sm text-slate-300 my-4">
-              <div className="flex items-center gap-4 text-xs font-semibold text-slate-400">
+            <div className="space-y-3.5 text-sm text-slate-300 my-4">
+              <div className="flex items-center gap-4 text-xs text-slate-400 pb-2 border-b border-white/[0.06]">
                 <span>Autor: <strong className="text-slate-200">{selectedBook.author}</strong></span>
-                <span>Capítulos: <strong className="text-slate-200">{selectedBook.chapters}</strong></span>
+                <span aria-hidden="true" className="text-slate-600">·</span>
+                <span>Capítulos: <strong className="text-slate-200 font-data">{selectedBook.chapters}</strong></span>
               </div>
-              <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700">
-                <span className="text-xs font-bold text-indigo-300 block mb-1">Tema Principal:</span>
-                <p className="text-slate-200">{selectedBook.theme}</p>
+              <div className="p-3.5 rounded-xl bg-slate-950/60 border border-white/[0.08]">
+                <span className="text-xs font-semibold text-amber-300/90 block mb-1">Tema Principal</span>
+                <p className="text-slate-200 text-xs sm:text-sm leading-relaxed">{selectedBook.theme}</p>
               </div>
-              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
-                <span className="text-xs font-bold text-amber-300 block mb-1">Versículo Chave:</span>
-                <p className="text-amber-100 font-serif italic text-xs leading-relaxed">{selectedBook.keyVerse}</p>
+              <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-400/20">
+                <span className="text-xs font-semibold text-amber-300 block mb-1">Versículo-Chave</span>
+                <p className="text-amber-100 font-serif italic text-xs sm:text-sm leading-relaxed">"{selectedBook.keyVerse}"</p>
               </div>
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed pt-1">
                 {selectedBook.summary}
               </p>
             </div>
 
             <button
               onClick={() => setSelectedBook(null)}
-              className="w-full mt-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs"
+              className="w-full mt-4 py-2.5 rounded-xl tactile-button-primary text-slate-950 font-bold text-xs tracking-wide transition cursor-pointer"
             >
               Concluir Leitura
             </button>
