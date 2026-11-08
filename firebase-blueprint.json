@@ -1,0 +1,124 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with game progress and unlocked achievements",
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "description": "User display name",
+          "minLength": 2,
+          "maxLength": 50
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address",
+          "maxLength": 100
+        },
+        "ageGroup": {
+          "type": "string",
+          "description": "Preferred age group category",
+          "enum": ["kids", "teens", "adults", "masters"]
+        },
+        "avatarId": {
+          "type": "string",
+          "description": "Selected avatar identifier",
+          "maxLength": 30
+        },
+        "totalScore": {
+          "type": "number",
+          "description": "Cumulative score earned across all games"
+        },
+        "gamesPlayed": {
+          "type": "number",
+          "description": "Total number of games played"
+        },
+        "millionWins": {
+          "type": "number",
+          "description": "Total times reached 1 million points"
+        },
+        "highestScore": {
+          "type": "number",
+          "description": "Highest score achieved in a single match"
+        },
+        "level": {
+          "type": "string",
+          "description": "Spiritual rank title (e.g. Aprendiz, Levita, etc.)",
+          "maxLength": 40
+        },
+        "unlockedAchievements": {
+          "type": "array",
+          "description": "List of unlocked achievement IDs"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update timestamp"
+        }
+      },
+      "required": ["displayName", "totalScore", "gamesPlayed", "highestScore"]
+    },
+    "Score": {
+      "title": "Score",
+      "description": "Individual game match score record for leaderboard ranking",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "UID of the player",
+          "maxLength": 128
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Player name at time of match",
+          "maxLength": 50
+        },
+        "avatarId": {
+          "type": "string",
+          "description": "Player avatar icon",
+          "maxLength": 30
+        },
+        "score": {
+          "type": "number",
+          "description": "Final score earned in the match"
+        },
+        "category": {
+          "type": "string",
+          "description": "Category played (kids, teens, adults, masters)",
+          "maxLength": 30
+        },
+        "questionsAnswered": {
+          "type": "number",
+          "description": "Number of questions answered correctly"
+        },
+        "wonMillion": {
+          "type": "boolean",
+          "description": "Whether the player won the 1 Million prize"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the score was posted"
+        }
+      },
+      "required": ["userId", "displayName", "score", "category"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/User"
+      },
+      "description": "Stores user profile and persistence data"
+    },
+    "/scores/{scoreId}": {
+      "schema": {
+        "$ref": "#/entities/Score"
+      },
+      "description": "Global leaderboard score entries"
+    }
+  }
+}

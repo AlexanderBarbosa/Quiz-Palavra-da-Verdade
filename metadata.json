@@ -1,0 +1,6 @@
+{
+  "name": "Quiz Palavra da Verdade",
+  "description": "Quiz bíblico interativo com níveis de dificuldade por faixa etária, rankings globais em tempo real, conquistas e biblioteca de estudos offline.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

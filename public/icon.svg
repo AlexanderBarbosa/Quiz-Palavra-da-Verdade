@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1E3A8A"/>
+      <stop offset="100%" stop-color="#0B132B"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FCD34D"/>
+      <stop offset="50%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="100" fill="url(#bg)"/>
+  <circle cx="256" cy="256" r="210" stroke="url(#gold)" stroke-width="8" fill="none" opacity="0.6"/>
+  <!-- Cross and Bible -->
+  <path d="M120 180 C120 160 256 150 256 170 C256 150 392 160 392 180 L392 360 C392 340 256 330 256 350 C256 330 120 340 120 360 Z" fill="#F8FAFC" stroke="url(#gold)" stroke-width="6"/>
+  <line x1="256" y1="170" x2="256" y2="350" stroke="#CBD5E1" stroke-width="4"/>
+  <!-- Gold Cross on Center -->
+  <rect x="246" y="210" width="20" height="90" rx="4" fill="url(#gold)"/>
+  <rect x="226" y="235" width="60" height="20" rx="4" fill="url(#gold)"/>
+  <!-- Stars / Radiance -->
+  <polygon points="256,90 263,115 288,115 268,130 275,155 256,140 237,155 244,130 224,115 249,115" fill="url(#gold)"/>
+</svg>
